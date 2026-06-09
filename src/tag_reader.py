@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -22,10 +23,33 @@ class TagInfo:
         return bool(self.artist and self.genre)
 
 
+MOJIBAKE_RE = re.compile(r'[\u0080-\u00ff]')
+HANGUL_RE = re.compile(r'[\uac00-\ud7a3]')
+
+
+def _looks_like_mojibake(value: str) -> bool:
+    return bool(MOJIBAKE_RE.search(value))
+
+
+def _decode_cp949(value: str) -> str:
+    for enc in ("latin-1", "cp1252", "iso-8859-1"):
+        try:
+            decoded = value.encode(enc).decode("cp949")
+        except UnicodeError:
+            continue
+        if HANGUL_RE.search(decoded):
+            return decoded
+    return value
+
+
 def _normalize_tag(value: Optional[str]) -> Optional[str]:
     if value is None:
         return None
     clean = value.strip()
+    if not clean:
+        return None
+    if _looks_like_mojibake(clean):
+        clean = _decode_cp949(clean)
     return clean or None
 
 
