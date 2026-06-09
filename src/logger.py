@@ -25,6 +25,7 @@ def create_logger(destination: Path, verbose: bool = False) -> logging.Logger:
 
 def summary_message(summary: dict[str, int]) -> str:
     return (
-        f"Processed {summary['total']} files: copied={summary['copied']} moved={summary['moved']} "
-        f"skipped={summary['skipped']} errors={summary['errors']}"
+        f"✅ 완료! 총 {summary['total']}개 파일 처리: "
+        f"복사={summary['copied']}개 이동={summary['moved']}개 "
+        f"건너뜀={summary['skipped']}개 오류={summary['errors']}개"
     )

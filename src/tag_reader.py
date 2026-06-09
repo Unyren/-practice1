@@ -33,9 +33,9 @@ def read_tags(mp3_path: Path) -> TagInfo:
     try:
         tags = EasyID3(mp3_path)
     except ID3NoHeaderError:
-        return TagInfo(error="ID3 header missing")
+        return TagInfo(error="ID3 헤더 없음")
     except Exception as exc:
-        raise TagReadError(f"Failed to read tags for {mp3_path}: {exc}") from exc
+        raise TagReadError(f"태그 읽기 실패 {mp3_path}: {exc}") from exc
 
     artist = _normalize_tag(tags.get("artist", [None])[0])
     album = _normalize_tag(tags.get("album", [None])[0])

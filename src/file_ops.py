@@ -56,26 +56,26 @@ def transfer(
     progress_callback: Callable[[str], None] | None = None,
 ) -> FileOperationResult:
     if src.resolve() == dst.resolve():
-        return FileOperationResult(src=src, dst=dst, status="skipped", message="Source and destination are the same")
+        return FileOperationResult(src=src, dst=dst, status="skipped", message="원본과 대상이 동일합니다")
 
     ensure_directory(dst.parent)
 
     if dst.exists():
         if _files_are_equal(src, dst):
-            return FileOperationResult(src=src, dst=dst, status="skipped", message="Duplicate file already exists")
+            return FileOperationResult(src=src, dst=dst, status="skipped", message="동일한 파일이 이미 존재합니다")
 
         if duplicate_strategy == "skip":
-            return FileOperationResult(src=src, dst=dst, status="skipped", message="Destination exists")
+            return FileOperationResult(src=src, dst=dst, status="skipped", message="대상 파일이 이미 존재합니다")
         if duplicate_strategy == "rename":
             dst = _resolve_duplicate(dst)
         elif duplicate_strategy == "overwrite":
             if not dry_run:
                 dst.unlink()
     if progress_callback:
-        progress_callback(f"Preparing {src.name} -> {dst}")
+        progress_callback(f"처리 중: {src.name} -> {dst}")
 
     if dry_run:
-        return FileOperationResult(src=src, dst=dst, status="dry-run", message="Dry run: no file written")
+        return FileOperationResult(src=src, dst=dst, status="dry-run", message="시뮬레이션: 실제 파일은 이동되지 않았습니다")
 
     try:
         if mode == "copy":
@@ -83,6 +83,6 @@ def transfer(
         else:
             shutil.move(src, dst)
     except Exception as exc:
-        raise FileOperationError(f"Failed to transfer {src} to {dst}: {exc}") from exc
+        raise FileOperationError(f"파일 전송 실패 {src} -> {dst}: {exc}") from exc
 
-    return FileOperationResult(src=src, dst=dst, status=mode, message="Success")
+    return FileOperationResult(src=src, dst=dst, status=mode, message="완료")
