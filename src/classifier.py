@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+import unicodedata
 
 from .config import OrganizeConfig
 from .tag_reader import TagInfo
@@ -10,6 +11,8 @@ INVALID_CHARS = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
 
 
 def _sanitize_component(value: str) -> str:
+    # Normalize Unicode to NFC to avoid composed/decomposed form issues
+    value = unicodedata.normalize("NFC", value)
     value = INVALID_CHARS.sub("_", value)
     value = value.strip()
     if not value:

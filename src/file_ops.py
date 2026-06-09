@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import shutil
 from dataclasses import dataclass
+import unicodedata
 from pathlib import Path
 from typing import Callable
 
@@ -37,7 +38,10 @@ def _resolve_duplicate(dst: Path) -> Path:
     parent = dst.parent
     counter = 1
     while True:
-        candidate = parent / f"{base}_{counter}{suffix}"
+        # Normalize candidate filename to NFC
+        candidate_name = f"{base}_{counter}{suffix}"
+        candidate_name = unicodedata.normalize("NFC", candidate_name)
+        candidate = parent / candidate_name
         if not candidate.exists():
             return candidate
         counter += 1
@@ -58,6 +62,8 @@ def transfer(
     if src.resolve() == dst.resolve():
         return FileOperationResult(src=src, dst=dst, status="skipped", message="원본과 대상이 동일합니다")
 
+    # Normalize destination path components to NFC to preserve Unicode
+    dst = Path(unicodedata.normalize("NFC", str(dst)))
     ensure_directory(dst.parent)
 
     if dst.exists():
