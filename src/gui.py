@@ -18,93 +18,88 @@ class OrganizerGUI(tk.Tk):
         self._create_widgets()
 
     def _create_widgets(self) -> None:
-        padding = {"padx": 10, "pady": 8}
-
         # 상단 제목
-        title_frame = ttk.Frame(self)
-        title_frame.pack(fill="x", **padding)
-        ttk.Label(title_frame, text="MP3 자동 분류 프로그램", font=("Arial", 16, "bold")).pack()
+        title_frame = tk.Frame(self)
+        title_frame.pack(fill="x", padx=10, pady=8)
+        tk.Label(title_frame, text="MP3 자동 분류 프로그램", font=("Arial", 16, "bold")).pack()
 
         # 메인 설정 프레임
         frame = ttk.LabelFrame(self, text="기본 설정", padding=10)
-        frame.pack(fill="x", **padding)
+        frame.pack(fill="x", padx=10, pady=8)
 
-        ttk.Label(frame, text="원본 폴더:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", pady=8)
+        tk.Label(frame, text="원본 폴더:").grid(row=0, column=0, sticky="w", pady=8)
         self.source_var = tk.StringVar()
-        ttk.Entry(frame, textvariable=self.source_var, width=70, font=("Arial", 10)).grid(row=0, column=1, sticky="ew", padx=5)
+        ttk.Entry(frame, textvariable=self.source_var, width=70).grid(row=0, column=1, sticky="ew", padx=5)
         ttk.Button(frame, text="찾기", command=self._browse_source, width=10).grid(row=0, column=2, padx=5)
 
-        ttk.Label(frame, text="저장 폴더:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", pady=8)
+        tk.Label(frame, text="저장 폴더:").grid(row=1, column=0, sticky="w", pady=8)
         self.dest_var = tk.StringVar()
-        ttk.Entry(frame, textvariable=self.dest_var, width=70, font=("Arial", 10)).grid(row=1, column=1, sticky="ew", padx=5)
+        ttk.Entry(frame, textvariable=self.dest_var, width=70).grid(row=1, column=1, sticky="ew", padx=5)
         ttk.Button(frame, text="찾기", command=self._browse_destination, width=10).grid(row=1, column=2, padx=5)
 
         # 분류 설정 프레임
         classify_frame = ttk.LabelFrame(self, text="분류 설정", padding=10)
-        classify_frame.pack(fill="x", **padding)
+        classify_frame.pack(fill="x", padx=10, pady=8)
 
-        ttk.Label(classify_frame, text="분류 방식:", font=("Arial", 10)).grid(row=0, column=0, sticky="w", pady=8)
+        tk.Label(classify_frame, text="분류 방식:").grid(row=0, column=0, sticky="w", pady=8)
         self.mode_var = tk.StringVar(value="copy")
         ttk.Combobox(
             classify_frame,
             textvariable=self.mode_var,
             values=["복사 (copy)", "이동 (move)"],
             state="readonly",
-            width=25,
-            font=("Arial", 10)
+            width=25
         ).grid(row=0, column=1, sticky="w", padx=5)
 
-        ttk.Label(classify_frame, text="중복 파일 처리:", font=("Arial", 10)).grid(row=1, column=0, sticky="w", pady=8)
+        tk.Label(classify_frame, text="중복 파일 처리:").grid(row=1, column=0, sticky="w", pady=8)
         self.duplicate_var = tk.StringVar(value="rename")
         ttk.Combobox(
             classify_frame,
             textvariable=self.duplicate_var,
             values=["이름 변경 (rename)", "건너뛰기 (skip)", "덮어쓰기 (overwrite)"],
             state="readonly",
-            width=25,
-            font=("Arial", 10)
+            width=25
         ).grid(row=1, column=1, sticky="w", padx=5)
 
-        ttk.Label(classify_frame, text="폴더 구조:", font=("Arial", 10)).grid(row=2, column=0, sticky="w", pady=8)
+        tk.Label(classify_frame, text="폴더 구조:").grid(row=2, column=0, sticky="w", pady=8)
         self.template_var = tk.StringVar(value="genre/{genre}/{artist}")
-        ttk.Entry(classify_frame, textvariable=self.template_var, width=70, font=("Arial", 10)).grid(row=2, column=1, columnspan=2, sticky="ew", padx=5)
-        ttk.Label(classify_frame, text="예: genre/{genre}/{artist}, artist/{artist}/{album}", font=("Arial", 8), foreground="gray").grid(row=3, column=1, columnspan=2, sticky="w", padx=5)
+        ttk.Entry(classify_frame, textvariable=self.template_var, width=70).grid(row=2, column=1, columnspan=2, sticky="ew", padx=5)
+        tk.Label(classify_frame, text="예: genre/{genre}/{artist}, artist/{artist}/{album}", font=("Arial", 8), foreground="gray").grid(row=3, column=1, columnspan=2, sticky="w", padx=5)
 
-        ttk.Label(classify_frame, text="태그 없는 파일:", font=("Arial", 10)).grid(row=4, column=0, sticky="w", pady=8)
+        tk.Label(classify_frame, text="태그 없는 파일:").grid(row=4, column=0, sticky="w", pady=8)
         self.fallback_var = tk.StringVar(value="분류안됨")
-        ttk.Entry(classify_frame, textvariable=self.fallback_var, width=30, font=("Arial", 10)).grid(row=4, column=1, sticky="w", padx=5)
+        ttk.Entry(classify_frame, textvariable=self.fallback_var, width=30).grid(row=4, column=1, sticky="w", padx=5)
 
-        ttk.Label(classify_frame, text="제외 패턴:", font=("Arial", 10)).grid(row=5, column=0, sticky="w", pady=8)
+        tk.Label(classify_frame, text="제외 패턴:").grid(row=5, column=0, sticky="w", pady=8)
         self.exclude_var = tk.StringVar()
-        ttk.Entry(classify_frame, textvariable=self.exclude_var, width=70, font=("Arial", 10)).grid(row=5, column=1, columnspan=2, sticky="ew", padx=5)
-        ttk.Label(classify_frame, text="쉼표로 구분 (예: temp, backup)", font=("Arial", 8), foreground="gray").grid(row=6, column=1, columnspan=2, sticky="w", padx=5)
+        ttk.Entry(classify_frame, textvariable=self.exclude_var, width=70).grid(row=5, column=1, columnspan=2, sticky="ew", padx=5)
+        tk.Label(classify_frame, text="쉼표로 구분 (예: temp, backup)", font=("Arial", 8), foreground="gray").grid(row=6, column=1, columnspan=2, sticky="w", padx=5)
 
         # 옵션 프레임
         option_frame = ttk.LabelFrame(self, text="옵션", padding=10)
-        option_frame.pack(fill="x", **padding)
+        option_frame.pack(fill="x", padx=10, pady=8)
 
         self.dry_run_var = tk.BooleanVar(value=False)
-        ttk.Checkbutton(option_frame, text="시뮬레이션만 실행 (파일 이동/복사 없음)", variable=self.dry_run_var, font=("Arial", 10)).pack(anchor="w", pady=5)
+        ttk.Checkbutton(option_frame, text="시뮬레이션만 실행 (파일 이동/복사 없음)", variable=self.dry_run_var).pack(anchor="w", pady=5)
 
         self.verbose_var = tk.BooleanVar(value=False)
-        ttk.Checkbutton(option_frame, text="상세 로그 출력", variable=self.verbose_var, font=("Arial", 10)).pack(anchor="w", pady=5)
+        ttk.Checkbutton(option_frame, text="상세 로그 출력", variable=self.verbose_var).pack(anchor="w", pady=5)
 
         # 시작 버튼 및 상태
-        button_frame = ttk.Frame(self)
-        button_frame.pack(fill="x", **padding)
+        button_frame = tk.Frame(self)
+        button_frame.pack(fill="x", padx=10, pady=8)
         ttk.Button(button_frame, text="시작", command=self._start_organizer, width=20).pack(side="left", padx=5)
         ttk.Button(button_frame, text="초기화", command=self._reset_form, width=20).pack(side="left", padx=5)
 
         self.status_var = tk.StringVar(value="준비 완료")
-        status_label = ttk.Label(self, textvariable=self.status_var, font=("Arial", 9), foreground="blue")
-        status_label.pack(fill="x", padx=10, pady=5)
+        tk.Label(self, textvariable=self.status_var).pack(fill="x", padx=10, pady=5)
 
         # 로그 영역
-        log_label = ttk.Label(self, text="처리 로그", font=("Arial", 10, "bold"))
-        log_label.pack(anchor="w", padx=10, pady=(10, 0))
+        tk.Label(self, text="처리 로그", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=(10, 0))
         
         self.log_text = tk.Text(self, wrap="word", height=15, state="disabled", font=("Courier", 9))
         self.log_text.pack(fill="both", expand=True, padx=10, pady=(5, 10))
+
 
     def _browse_source(self) -> None:
         selected = filedialog.askdirectory(title="원본 폴더 선택")
