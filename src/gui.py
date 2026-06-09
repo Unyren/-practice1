@@ -42,7 +42,7 @@ class OrganizerGUI(tk.Tk):
         classify_frame.pack(fill="x", padx=10, pady=8)
 
         tk.Label(classify_frame, text="분류 방식:").grid(row=0, column=0, sticky="w", pady=8)
-        self.mode_var = tk.StringVar(value="copy")
+        self.mode_var = tk.StringVar(value="복사 (copy)")
         ttk.Combobox(
             classify_frame,
             textvariable=self.mode_var,
@@ -52,7 +52,7 @@ class OrganizerGUI(tk.Tk):
         ).grid(row=0, column=1, sticky="w", padx=5)
 
         tk.Label(classify_frame, text="중복 파일 처리:").grid(row=1, column=0, sticky="w", pady=8)
-        self.duplicate_var = tk.StringVar(value="rename")
+        self.duplicate_var = tk.StringVar(value="이름 변경 (rename)")
         ttk.Combobox(
             classify_frame,
             textvariable=self.duplicate_var,
@@ -135,6 +135,11 @@ class OrganizerGUI(tk.Tk):
     def _set_status(self, text: str) -> None:
         self.status_var.set(text)
 
+    def _parse_option(self, value: str, fallback: str) -> str:
+        if "(" in value and ")" in value:
+            return value.split("(", 1)[1].rstrip(")")
+        return fallback
+
     def _start_organizer(self) -> None:
         source = self.source_var.get().strip()
         destination = self.dest_var.get().strip()
@@ -142,8 +147,8 @@ class OrganizerGUI(tk.Tk):
             self._append_log("원본 폴더와 저장 폴더를 반드시 선택해주세요.")
             return
 
-        mode = self.mode_var.get().split("(")[1].rstrip(")")
-        duplicate = self.duplicate_var.get().split("(")[1].rstrip(")")
+        mode = self._parse_option(self.mode_var.get(), "copy")
+        duplicate = self._parse_option(self.duplicate_var.get(), "rename")
         
         config = OrganizeConfig(
             source=Path(source),
