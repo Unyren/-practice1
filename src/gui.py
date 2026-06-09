@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import tkinter as tk
+import unicodedata
 from pathlib import Path
 from tkinter import filedialog, ttk
 
@@ -101,15 +102,18 @@ class OrganizerGUI(tk.Tk):
         self.log_text.pack(fill="both", expand=True, padx=10, pady=(5, 10))
 
 
+    def _normalize_path(self, path: str) -> str:
+        return unicodedata.normalize("NFC", path) if path else path
+
     def _browse_source(self) -> None:
         selected = filedialog.askdirectory(title="원본 폴더 선택")
         if selected:
-            self.source_var.set(selected)
+            self.source_var.set(self._normalize_path(selected))
 
     def _browse_destination(self) -> None:
         selected = filedialog.askdirectory(title="저장 폴더 선택")
         if selected:
-            self.dest_var.set(selected)
+            self.dest_var.set(self._normalize_path(selected))
 
     def _reset_form(self) -> None:
         self.source_var.set("")
@@ -141,8 +145,8 @@ class OrganizerGUI(tk.Tk):
         return fallback
 
     def _start_organizer(self) -> None:
-        source = self.source_var.get().strip()
-        destination = self.dest_var.get().strip()
+        source = self._normalize_path(self.source_var.get().strip())
+        destination = self._normalize_path(self.dest_var.get().strip())
         if not source or not destination:
             self._append_log("원본 폴더와 저장 폴더를 반드시 선택해주세요.")
             return

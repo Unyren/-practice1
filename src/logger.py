@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 
 
@@ -11,7 +12,7 @@ def create_logger(destination: Path, verbose: bool = False) -> logging.Logger:
 
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
