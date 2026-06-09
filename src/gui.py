@@ -14,7 +14,7 @@ class OrganizerGUI(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title("MP3 자동 분류 프로그램")
-        self.geometry("900x700")
+        self.geometry("800x650")
         self.resizable(True, True)
         self._create_widgets()
 
@@ -62,9 +62,16 @@ class OrganizerGUI(tk.Tk):
             width=25
         ).grid(row=1, column=1, sticky="w", padx=5)
 
-        tk.Label(classify_frame, text="폴더 구조:").grid(row=2, column=0, sticky="w", pady=8)
-        self.template_var = tk.StringVar(value="genre/{genre}/{artist}")
-        ttk.Entry(classify_frame, textvariable=self.template_var, width=70).grid(row=2, column=1, columnspan=2, sticky="ew", padx=5)
+        tk.Label(classify_frame, text="분류 기준:").grid(row=2, column=0, sticky="w", pady=8)
+        self.criteria_var = tk.StringVar(value="genre")
+        criteria_frame = tk.Frame(classify_frame)
+        criteria_frame.grid(row=2, column=1, columnspan=2, sticky="w", padx=5)
+        ttk.Radiobutton(criteria_frame, text="장르별", variable=self.criteria_var, value="genre", command=self._apply_criteria_template).pack(side="left", padx=(0, 5))
+        ttk.Radiobutton(criteria_frame, text="가수별", variable=self.criteria_var, value="artist", command=self._apply_criteria_template).pack(side="left", padx=(0, 5))
+
+        tk.Label(classify_frame, text="폴더 구조:").grid(row=3, column=0, sticky="w", pady=8)
+        self.template_var = tk.StringVar(value="genre/{genre}")
+        ttk.Entry(classify_frame, textvariable=self.template_var, width=70).grid(row=3, column=1, columnspan=2, sticky="ew", padx=5)
         tk.Label(classify_frame, text="예: genre/{genre}/{artist}, artist/{artist}/{album}", font=("Arial", 8), foreground="gray").grid(row=3, column=1, columnspan=2, sticky="w", padx=5)
 
         tk.Label(classify_frame, text="태그 없는 파일:").grid(row=4, column=0, sticky="w", pady=8)
@@ -97,9 +104,13 @@ class OrganizerGUI(tk.Tk):
 
         # 로그 영역
         tk.Label(self, text="처리 로그", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=(10, 0))
-        
-        self.log_text = tk.Text(self, wrap="word", height=15, state="disabled", font=("Courier", 9))
-        self.log_text.pack(fill="both", expand=True, padx=10, pady=(5, 10))
+        log_frame = tk.Frame(self)
+        log_frame.pack(fill="both", expand=True, padx=10, pady=(5, 10))
+        self.log_text = tk.Text(log_frame, wrap="word", height=15, state="disabled", font=("Courier", 9))
+        scrollbar = ttk.Scrollbar(log_frame, orient="vertical", command=self.log_text.yview)
+        self.log_text.configure(yscrollcommand=scrollbar.set)
+        self.log_text.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
 
     def _normalize_path(self, path: str) -> str:
@@ -123,6 +134,8 @@ class OrganizerGUI(tk.Tk):
         self.template_var.set("genre/{genre}/{artist}")
         self.fallback_var.set("분류안됨")
         self.exclude_var.set("")
+        self.criteria_var.set("genre")
+        self.template_var.set("genre/{genre}")
         self.dry_run_var.set(False)
         self.verbose_var.set(False)
         self.log_text.configure(state="normal")
@@ -138,6 +151,12 @@ class OrganizerGUI(tk.Tk):
 
     def _set_status(self, text: str) -> None:
         self.status_var.set(text)
+
+    def _apply_criteria_template(self) -> None:
+        if self.criteria_var.get() == "genre":
+            self.template_var.set("genre/{genre}")
+        else:
+            self.template_var.set("artist/{artist}")
 
     def _parse_option(self, value: str, fallback: str) -> str:
         if "(" in value and ")" in value:
